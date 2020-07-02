@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-import pandas as pd
 import os
 from sklearn.cluster import KMeans
 import string
@@ -9,9 +8,7 @@ def image_names(path):
 	all_images = os.listdir(path)
 	return all_images
 
-def image_reader(path, images, n_clusters, symbols):
-	H = 45
-	W = 100
+def image_reader(path, images, n_clusters=len('.*"/#$%'), symbols='.*"/#$%', H=45, W=100):
 	H, W = W, H
 	document = []
 	for img in images:
@@ -34,24 +31,24 @@ def image_reader(path, images, n_clusters, symbols):
 			new_image.append(img)
 		new_image = np.array(new_image)
 		reformed_data = []
+		file = open('./reformed/txt/'+name[:name.index('.')+1]+'txt', 'a')
 		for row in new_image:
 			column = []
 			for col in row:
 				column .append(symbols[col])
 			print(''.join(column))
+			file.write(''.join(column)+'\n')
 			reformed_data.append(column)
 		print()
-		reformed_data =  np.array(reformed_data)
-		reformed_data = pd.DataFrame(reformed_data)
-		reformed_data.to_csv('./reformed/'+name[:name.index('.')+1]+'csv', header=None, index=None)
-
-
-
-
+		file.close()
+		
 path = './images/'
 symbols = input("Enter Symbols you wish to use:\t")
+H = int(input('Enter Height:\t'))
+W = int(input('Enter Width:\t'))
 if len(symbols) == 0:
 	symbols = string.punctuation
 n_clusters = len(symbols)
 images = image_names(path)
-image_reader(path, images, n_clusters, symbols)
+image_reader(path, images, n_clusters, symbols, H, W)
+#image_reader(path, images)
